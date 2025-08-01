@@ -1,6 +1,5 @@
-import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.diffplug.gradle.spotless.SpotlessPlugin
+import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
     java
@@ -37,6 +36,8 @@ repositories {
     mavenCentral()
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
     maven { url = uri("https://repo.dmulloy2.net/nexus/repository/public/") }
+    maven { url = uri("https://repo.codemc.io/repository/maven-releases/") }
+    maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }
     maven { url = uri("https://maven.enginehub.org/repo/") }
 }
 
@@ -46,6 +47,7 @@ dependencies {
     compileOnly("com.intellectualsites.plotsquared:plotsquared-core")
     compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit") { isTransitive = false }
     compileOnly(libs.protocollib)
+    implementation(libs.packetevents)
     compileOnly(libs.worldedit)
     implementation("org.bstats:bstats-bukkit")
     implementation("org.bstats:bstats-base")
@@ -68,7 +70,7 @@ bukkit {
     apiVersion = "1.13"
     description = "Hide plots from other players"
     version = rootProject.version.toString()
-    depend = listOf("ProtocolLib", "PlotSquared")
+    depend = listOf("PlotSquared")
     website = "https://www.spigotmc.org/resources/20701/"
 
     permissions {
@@ -80,12 +82,20 @@ bukkit {
 
 tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier.set(null as String?)
+
+    relocate("org.bstats", "com.plotsquared.plothider.metrics")
+    relocate("com.github.retrooper.packetevents", "com.plotsquared.plothider.packetevents")
+    relocate("io.github.retrooper.packetevents", "com.plotsquared.plothider.packetevents2")
+
     dependencies {
-        relocate("org.bstats", "com.plotsquared.plothider.metrics") {
-            include(dependency("org.bstats:bstats-base"))
-            include(dependency("org.bstats:bstats-bukkit"))
-        }
+        include(dependency("org.bstats:bstats-base"))
+        include(dependency("org.bstats:bstats-bukkit"))
+        include(dependency("net.kyori:adventure-nbt"))
+        include(dependency("com.github.retrooper:packetevents-api"))
+        include(dependency("com.github.retrooper:packetevents-netty-common"))
+        include(dependency("com.github.retrooper:packetevents-spigot"))
     }
+
     minimize()
 }
 
@@ -105,6 +115,7 @@ modrinth {
     gameVersions.addAll(supportedVersions)
     loaders.addAll(listOf("paper", "purpur", "spigot"))
     syncBodyFrom.set(rootProject.file("README.md").readText())
-    changelog.set("The changelog is available on GitHub: https://github" +
-            ".com/IntellectualSites/plothider/releases/tag/${project.version}")
+    changelog.set(
+        "The changelog is available on GitHub: https://github" + ".com/IntellectualSites/plothider/releases/tag/${project.version}"
+    )
 }

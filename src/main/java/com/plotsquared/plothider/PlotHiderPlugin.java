@@ -18,7 +18,8 @@
  */
 package com.plotsquared.plothider;
 
-import com.comphenix.protocol.ProtocolLibrary;
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import com.plotsquared.bukkit.util.BukkitUtil;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.configuration.Settings;
@@ -28,6 +29,7 @@ import com.plotsquared.core.configuration.caption.load.DefaultCaptionProvider;
 import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.flag.GlobalFlagContainer;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -49,19 +51,20 @@ public class PlotHiderPlugin extends JavaPlugin implements Listener {
     public static final String PLOT_HIDER_NAMESPACE = "plothider";
     private static final int BSTATS_ID = 6412;
 
-    @SuppressWarnings("deprecation") // Paper deprecation
+    @Override
+    public void onLoad() {
+        // PacketEvents
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        PacketEvents.getAPI().getSettings().reEncodeByDefault(false);
+        PacketEvents.getAPI().load();
+    }
+
     @Override
     public void onEnable() {
-        // Check based on #startsWith because plugin version contains the build number.
-        if (!ProtocolLibrary.getPlugin().getDescription().getVersion().startsWith("5")) {
-            getLogger().log(Level.SEVERE, "ProtocolLib 5 is required to run " +
-                    "PlotHider, please install the latest update:");
-            getLogger().log(Level.INFO, "https://www.spigotmc.org/resources/protocollib.1997/");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
+        // PacketEvents
+        PacketEvents.getAPI().init();
+        PacketEvents.getAPI().getEventManager().registerListener(new PacketHandler2(this), PacketListenerPriority.NORMAL);
 
-        new PacketHandler(this);
         Bukkit.getPluginManager().registerEvents(this, this);
         new PlotSquaredListener();
         GlobalFlagContainer.getInstance().addFlag(HideFlag.HIDE_FLAG_FALSE);
@@ -71,6 +74,12 @@ public class PlotHiderPlugin extends JavaPlugin implements Listener {
             getLogger().log(Level.SEVERE, "Failed to load captions", e);
         }
         new Metrics(this, BSTATS_ID);
+    }
+
+    @Override
+    public void onDisable() {
+        // PacketEvents
+        PacketEvents.getAPI().terminate();
     }
 
     private void loadCaptions() throws IOException {
