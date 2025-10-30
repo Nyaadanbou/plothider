@@ -8,7 +8,6 @@ plugins {
     alias(libs.plugins.shadow)
     alias(libs.plugins.pluginyml)
     alias(libs.plugins.spotless)
-    alias(libs.plugins.minotaur)
 }
 
 java {
@@ -46,7 +45,6 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api")
     compileOnly("com.intellectualsites.plotsquared:plotsquared-core")
     compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit") { isTransitive = false }
-    compileOnly(libs.protocollib)
     implementation(libs.packetevents)
     compileOnly(libs.worldedit)
     implementation("org.bstats:bstats-bukkit")
@@ -101,21 +99,4 @@ tasks.named<ShadowJar>("shadowJar") {
 
 tasks.named("build").configure {
     dependsOn("shadowJar")
-}
-
-val supportedVersions = listOf("1.16.5", "1.17.1", "1.18.2", "1.19", "1.19.1", "1.19.2", "1.19.3", "1.19.4", "1.20", "1.20.1", "1.20.2")
-
-modrinth {
-    token.set(System.getenv("MODRINTH_TOKEN"))
-    projectId.set("plothider")
-    versionName.set("${project.version}")
-    versionNumber.set("${project.version}")
-    versionType.set("release")
-    uploadFile.set(file("build/libs/${rootProject.name}-${project.version}.jar"))
-    gameVersions.addAll(supportedVersions)
-    loaders.addAll(listOf("paper", "purpur", "spigot"))
-    syncBodyFrom.set(rootProject.file("README.md").readText())
-    changelog.set(
-        "The changelog is available on GitHub: https://github" + ".com/IntellectualSites/plothider/releases/tag/${project.version}"
-    )
 }

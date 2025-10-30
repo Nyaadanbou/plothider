@@ -1,8 +1,7 @@
 [versions]
 # Plugins
 worldedit = "7.3.0"
-protocollib = "5.3.0"
-packetevents = "2.9.4"
+packetevents = "2.9.5"
 
 # Third party
 bstats = "3.0.0"
@@ -16,11 +15,9 @@ minotaur = "2.8.7"
 [libraries]
 # Plugins
 worldedit = { group = "com.sk89q.worldedit", name = "worldedit-bukkit", version.ref = "worldedit" }
-protocollib = { group = "com.comphenix.protocol", name = "ProtocolLib", version.ref = "protocollib" }
 packetevents = { group = "com.github.retrooper", name = "packetevents-spigot", version.ref = "packetevents" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 pluginyml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "bukkityml" }
-minotaur = { id = "com.modrinth.minotaur", version.ref = "minotaur" }
