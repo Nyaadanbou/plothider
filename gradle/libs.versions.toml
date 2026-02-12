@@ -1,7 +1,7 @@
 [versions]
 # Plugins
-worldedit = "7.3.0"
-packetevents = "2.9.5"
+worldedit = "7.4.0"
+packetevents = "2.11.2"
 
 # Third party
 bstats = "3.0.0"
